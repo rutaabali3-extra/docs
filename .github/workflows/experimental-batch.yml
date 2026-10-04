@@ -1,0 +1,36 @@
+name: Experimental Batch - 15 PRs and Releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Confirm creation and merge of 15 test PRs and publication of 15 prereleases
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: experimental-batch-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  create-batch:
+    name: Create 15 test PRs and 15 prereleases
+    if: ${{ inputs.confirm }}
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      - name: Check out the selected source branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create, merge, and release the experiment batch
+        shell: bash
+        run: bash .github/scripts/experimental-batch.sh
