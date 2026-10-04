@@ -5,6 +5,7 @@ set -euo pipefail
 : "${DEFAULT_BRANCH:?The repository default branch was not provided.}"
 : "${GH_TOKEN:?The GitHub token was not provided.}"
 
+repository="${GITHUB_REPOSITORY:-$(gh repo view --json nameWithOwner --jq '.nameWithOwner')}"
 head_branch="$GITHUB_REF_NAME"
 base_branch="$DEFAULT_BRANCH"
 
@@ -20,7 +21,7 @@ fi
 
 # Fail closed if this batch has already been started or completed. Each output is
 # intentionally one-shot so reruns cannot silently create another 15 releases.
-existing_releases="$(gh release list --limit 100 --json tagName --jq '.[].tagName')"
+existing_releases="$(gh api --paginate "repos/${repository}/releases?per_page=100" --jq '.[].tag_name')"
 for i in $(seq 1 15); do
   item="$(printf '%02d' "$i")"
   tag="experimental-${item}"
