@@ -51,10 +51,10 @@ existing_pr="$(jq -r '.[0].number // empty' <<< "$open_prs")"
 fetch_base() {
   git fetch origin "+refs/heads/${base_branch}:refs/remotes/origin/${base_branch}"
 }
-fetch_base
-git merge --no-edit "origin/$base_branch"
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+fetch_base
+git merge --no-edit "origin/$base_branch"
 
 for i in $(seq 1 15); do
   item="$(printf '%02d' "$i")"
